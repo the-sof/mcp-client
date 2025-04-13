@@ -1,0 +1,80 @@
+2025-04-13 10:47:41,792 - mcp.client.sse - INFO - Connecting to SSE endpoint: http://localhost:8000/sse
+2025-04-13 10:47:41,999 - httpx - INFO - HTTP Request: GET http://localhost:8000/sse "HTTP/1.1 200 OK"
+2025-04-13 10:47:42,001 - mcp.client.sse - INFO - Received endpoint URL: http://localhost:8000/messages/?session_id=a051035fa5b94a2d9ac5759b7c734dea
+2025-04-13 10:47:42,001 - mcp.client.sse - INFO - Starting post writer with endpoint URL: http://localhost:8000/messages/?session_id=a051035fa5b94a2d9ac5759b7c734dea
+2025-04-13 10:47:42,006 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a051035fa5b94a2d9ac5759b7c734dea "HTTP/1.1 202 Accepted"
+2025-04-13 10:47:42,014 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a051035fa5b94a2d9ac5759b7c734dea "HTTP/1.1 202 Accepted"
+2025-04-13 10:47:42,021 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a051035fa5b94a2d9ac5759b7c734dea "HTTP/1.1 202 Accepted"
+2025-04-13 10:47:42,022 - __main__ - INFO - 
+Connected to SSE MCP Server at http://localhost:8000/sse. Available tools: ['browser_use', 'browser_get_result']
+2025-04-13 10:48:21,534 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a051035fa5b94a2d9ac5759b7c734dea "HTTP/1.1 202 Accepted"
+2025-04-13 10:48:21,536 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 10:48:24,289 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 10:48:24,313 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a051035fa5b94a2d9ac5759b7c734dea "HTTP/1.1 202 Accepted"
+2025-04-13 10:48:26,296 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 10:52:59,890 - __main__ - INFO - 
+Connected to stdio MCP Server. Available tools: ['get_alerts', 'get_forecast']
+2025-04-13 10:53:21,548 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 10:53:23,954 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 10:53:28,638 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:05:08,504 - __main__ - INFO - 
+Connected to stdio MCP Server. Available tools: ['get_alerts', 'get_forecast']
+2025-04-13 11:06:59,685 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 11:07:02,339 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:07:06,432 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:12:14,840 - __main__ - INFO - 
+
+Connected to stdio MCP Server. Available tools: ['browser_close', 'browser_wait', 'browser_file_upload', 'browser_install', 'browser_press_key', 'browser_navigate', 'browser_navigate_back', 'browser_navigate_forward', 'browser_pdf_save', 'browser_snapshot', 'browser_click', 'browser_drag', 'browser_hover', 'browser_type', 'browser_select_option', 'browser_take_screenshot', 'browser_tab_list', 'browser_tab_new', 'browser_tab_select', 'browser_tab_close']
+2025-04-13 11:12:42,738 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 11:12:46,642 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:14:03,347 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 11:14:05,395 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:14:11,687 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:15:33,861 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 11:15:35,582 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:15:47,558 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:16:09,772 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 11:16:12,293 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:16:22,674 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:17:49,279 - mcp.client.sse - INFO - Connecting to SSE endpoint: http://localhost:8000/sse
+2025-04-13 11:17:49,311 - httpx - INFO - HTTP Request: GET http://localhost:8000/sse "HTTP/1.1 200 OK"
+2025-04-13 11:17:49,311 - mcp.client.sse - INFO - Received endpoint URL: http://localhost:8000/messages/?session_id=14dde17f104c40dd9ea1aa3bb9b036b2
+2025-04-13 11:17:49,311 - mcp.client.sse - INFO - Starting post writer with endpoint URL: http://localhost:8000/messages/?session_id=14dde17f104c40dd9ea1aa3bb9b036b2
+2025-04-13 11:17:49,315 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=14dde17f104c40dd9ea1aa3bb9b036b2 "HTTP/1.1 202 Accepted"
+2025-04-13 11:17:49,319 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=14dde17f104c40dd9ea1aa3bb9b036b2 "HTTP/1.1 202 Accepted"
+2025-04-13 11:17:49,320 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=14dde17f104c40dd9ea1aa3bb9b036b2 "HTTP/1.1 202 Accepted"
+2025-04-13 11:17:49,323 - __main__ - INFO - 
+
+Connected to SSE MCP Server at http://localhost:8000/sse. 
+Available tools: ['browser_use', 'browser_get_result']
+2025-04-13 11:18:13,486 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=14dde17f104c40dd9ea1aa3bb9b036b2 "HTTP/1.1 202 Accepted"
+2025-04-13 11:18:13,489 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 11:18:15,923 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:18:15,946 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=14dde17f104c40dd9ea1aa3bb9b036b2 "HTTP/1.1 202 Accepted"
+2025-04-13 11:18:17,655 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:18:58,973 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=14dde17f104c40dd9ea1aa3bb9b036b2 "HTTP/1.1 202 Accepted"
+2025-04-13 11:18:58,977 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 11:19:00,777 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:19:00,785 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=14dde17f104c40dd9ea1aa3bb9b036b2 "HTTP/1.1 202 Accepted"
+2025-04-13 11:19:08,521 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:53:34,262 - mcp.client.sse - INFO - Connecting to SSE endpoint: http://localhost:8000/sse
+2025-04-13 11:53:34,290 - httpx - INFO - HTTP Request: GET http://localhost:8000/sse "HTTP/1.1 200 OK"
+2025-04-13 11:53:34,291 - mcp.client.sse - INFO - Received endpoint URL: http://localhost:8000/messages/?session_id=a76dd6d246294bc499cdcc56ad0d97ae
+2025-04-13 11:53:34,291 - mcp.client.sse - INFO - Starting post writer with endpoint URL: http://localhost:8000/messages/?session_id=a76dd6d246294bc499cdcc56ad0d97ae
+2025-04-13 11:53:34,295 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a76dd6d246294bc499cdcc56ad0d97ae "HTTP/1.1 202 Accepted"
+2025-04-13 11:53:34,299 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a76dd6d246294bc499cdcc56ad0d97ae "HTTP/1.1 202 Accepted"
+2025-04-13 11:53:34,300 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a76dd6d246294bc499cdcc56ad0d97ae "HTTP/1.1 202 Accepted"
+2025-04-13 11:53:34,301 - __main__ - INFO - 
+
+Connected to SSE MCP Server at http://localhost:8000/sse. 
+Available tools: ['browser_use', 'browser_get_result']
+2025-04-13 11:54:20,967 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a76dd6d246294bc499cdcc56ad0d97ae "HTTP/1.1 202 Accepted"
+2025-04-13 11:54:20,970 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 11:54:23,575 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:54:23,601 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a76dd6d246294bc499cdcc56ad0d97ae "HTTP/1.1 202 Accepted"
+2025-04-13 11:54:26,025 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:54:52,176 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a76dd6d246294bc499cdcc56ad0d97ae "HTTP/1.1 202 Accepted"
+2025-04-13 11:54:52,179 - __main__ - INFO - Sending query to claude-3-5-sonnet-20241022...
+2025-04-13 11:54:53,890 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
+2025-04-13 11:54:53,901 - httpx - INFO - HTTP Request: POST http://localhost:8000/messages/?session_id=a76dd6d246294bc499cdcc56ad0d97ae "HTTP/1.1 202 Accepted"
+2025-04-13 11:54:56,134 - httpx - INFO - HTTP Request: POST https://api.anthropic.com/v1/messages "HTTP/1.1 200 OK"
