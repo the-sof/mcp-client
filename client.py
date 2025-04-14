@@ -251,8 +251,8 @@ async def main():
     if len(sys.argv) < 2:
         print("Usage: python client.py <server_script_path_or_url>")
         print("Examples:")
-        print("  - stdio server: python client.py @playwright/mcp@latest")
-        print("  - stdio server: python client.py ./weather.py")
+        print("  - stdio server (npm): python client.py @playwright/mcp@latest")
+        print("  - stdio server (python): python client.py ./weather.py")
         print("  - SSE server: python client.py http://localhost:3000/mcp")
         sys.exit(1)
 
