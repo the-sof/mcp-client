@@ -34,8 +34,7 @@ class MCPClient:
         self.session: Optional[ClientSession] = None
         self.exit_stack = AsyncExitStack()
         self.anthropic = Anthropic()
-        # self.http_session = None
-        # self.http_transport = None
+        
 
     async def connect_to_sse_server(self, server_url: str):
         """Connect to an SSE MCP server.
