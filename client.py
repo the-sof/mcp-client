@@ -475,11 +475,21 @@ class MCPClient:
                                 contents = [
                                     genai_types.Content(role="model", parts=[genai_types.Part(function_call=function_call)]) 
                                 ]
+                                # Add to messages history                               
+                                messages.append({
+                                                "role": "assistant", 
+                                                "content": function_call.model_dump_json()
+                                    })
 
                                 contents.append(
                                     genai_types.Content(role="user", parts=[function_response_part])
                                 )
-
+                                # Add to messages history                               
+                                messages.append({
+                                                "role": "user", 
+                                                "content": {"result": result}
+                                            })
+                               
                                 # Send function response to get final answer
                                 try:
                                     follow_up_response = model_instance.models.generate_content(
@@ -498,30 +508,15 @@ class MCPClient:
                                                     follow_up_text += follow_up_part.text
                                                     
                                             final_text.append(follow_up_text)
+                                            messages.append({
+                                                "role": "assistant", 
+                                                "content": follow_up_text
+                                            })
                                     
                                 except Exception as e:
                                     logger.error(f"Error in follow-up response: {str(e)}")
                                     final_text.append("Error processing function result.")
-            
-            # If we didn't find any function calls, try to get the full response text
-            if not has_function_call and not final_text:
-                try:
-                    assistant_response_text = response.text
-                    final_text.append(assistant_response_text)
-                except ValueError as e:
-                    logger.error(f"Error extracting text from response: {str(e)}")
-                    # Try to extract text directly from parts
-                    if hasattr(response, "candidates") and len(response.candidates) > 0:
-                        candidate = response.candidates[0]
-                        if hasattr(candidate, "content") and hasattr(candidate.content, "parts"):
-                            for part in candidate.content.parts:
-                                if hasattr(part, "text"):
-                                    final_text.append(part.text)
-            
-            # Construct a simplified text representation for the message history
-            simplified_response = " ".join(final_text)
-            messages.append({"role": "assistant", "content": simplified_response})
-            
+
         except Exception as e:
             logger.error(f"Error in Gemini processing: {str(e)}")
             raise
