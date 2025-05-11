@@ -4,7 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-        
         {
             "name": "Python Debugger: Current File with browser use SSE MCP Server",
             "type": "debugpy",
@@ -22,12 +21,44 @@
             "args": ["~/Documents/GitHub/MCP/weather/weather.py"]
         },
         {
+            "name": "Python Debugger: Current File with Weather Stdio MCP Server using openAI",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["~/Documents/GitHub/MCP/weather/weather.py", "openai"]
+        },
+        {
+            "name": "Python Debugger: Current File with Weather Stdio MCP Server using Google Gemini",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["~/Documents/GitHub/MCP/weather/weather.py", "gemini"]
+        },
+        {
             "name": "Python Debugger: Current File with playwright Stdio MCP Server",
             "type": "debugpy",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
             "args": ["@playwright/mcp@latest"]
+        },
+        {
+            "name": "Python Debugger: Current File with playwright Stdio MCP Server using openAI",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["@playwright/mcp@latest", "openai"]
+        },
+        {
+            "name": "Python Debugger: Current File with playwright Stdio MCP Server using Google Gemini",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "args": ["@playwright/mcp@latest", "gemini"]
         }
     ]
 }
