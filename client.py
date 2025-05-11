@@ -286,16 +286,18 @@ class MCPClient:
         response_message = response.choices[0].message
         final_text = []
         
-        # Add the assistant's response to messages
-        messages.append({
-            "role": "assistant",
-            "content": response_message.content,
-            "tool_calls": response_message.tool_calls
-        })
+        
         
         # Process tool calls if any
         if response_message.tool_calls:
             final_text.append(response_message.content or "")
+
+            # Add the assistant's response to messages
+            messages.append({
+                "role": "assistant",
+                "content": response_message.content,
+                "tool_calls": response_message.tool_calls
+            })
             
             for tool_call in response_message.tool_calls:
                 function_name = tool_call.function.name
@@ -337,192 +339,254 @@ class MCPClient:
         model = "gemini-2.0-flash"
         
         # Convert available_tools to a format suitable for Gemini
-        gemini_tools = []
-        for tool in available_tools:
-            # Gemini needs a specific schema format - convert from JSON Schema to Gemini's expected format
-            parameters = {}
-            if "input_schema" in tool and tool["input_schema"]:
-                schema = tool["input_schema"]
-                
-                # Start with basic structure
-                parameters = {
-                    "type": "OBJECT",
-                    "properties": {},
-                    "required": []
-                }
-                
-                # Add properties from the schema
-                if "properties" in schema:
-                    for prop_name, prop_details in schema["properties"].items():
-                        prop_type = prop_details.get("type", "STRING").upper()
-                        # Convert JSON schema types to Gemini types
-                        if prop_type.lower() == "number":
-                            prop_type = "NUMBER"
-                        elif prop_type.lower() == "integer":
-                            prop_type = "INTEGER"
-                        elif prop_type.lower() == "boolean":
-                            prop_type = "BOOLEAN"
-                        elif prop_type.lower() == "array":
-                            prop_type = "ARRAY"
-                        elif prop_type.lower() == "object":
-                            prop_type = "OBJECT"
-                        else:
-                            prop_type = "STRING"
-                            
-                        property_schema = {"type": prop_type}
-                        if "description" in prop_details:
-                            property_schema["description"] = prop_details["description"]
-                            
-                        parameters["properties"][prop_name] = property_schema
-                        
-                # Add required properties
-                if "required" in schema:
-                    parameters["required"] = schema["required"]
-            
-            function_declaration = {
-                "name": tool["name"],
-                "description": tool["description"],
-                "parameters": parameters
-            }
-            gemini_tools.append(function_declaration)
-
+        gemini_tools = self._convert_tools_to_gemini_format(available_tools)
         tools = genai_types.Tool(function_declarations=gemini_tools)
         config = genai_types.GenerateContentConfig(tools=[tools])
-        model_instance = self.gemini
         
         # Prepare chat history
-        # Add previous messages to chat history if provided
-        chat_history = []
-        if previous_messages:
-            for message in previous_messages:
-                if message["role"] == "user" and isinstance(message["content"], str):
-                    chat_history.append({
-                        "role": "user",
-                        "parts": [{"text": message["content"]}]
-                    })
-                elif message["role"] == "assistant" and isinstance(message["content"], str):
-                    chat_history.append({
-                        "role": "model",
-                        "parts": [{"text": message["content"]}]
-                    })
-
-        chat = model_instance.chats.create(
+        chat_history = self._prepare_gemini_chat_history(previous_messages)
+        
+        chat = self.gemini.chats.create(
             model=model,
             config=config,
             history=chat_history
         )
         
+        # Initialize variables for tracking conversation
         final_text = []
         messages = previous_messages.copy() if previous_messages else []
-        # Add current query to messages
         messages.append({"role": "user", "content": query})
         
-        # Send the request to Gemini
         try:
             logger.debug(f"Sending query to {model}...")
             response = chat.send_message(query)
             
-            # Handle function calls first because response.text may fail if there's a function call
-            final_text = []
-            has_function_call = False
-            if hasattr(response, "candidates") and len(response.candidates) > 0:
-                candidate = response.candidates[0]
-                if hasattr(candidate, "content") and hasattr(candidate.content, "parts"):
-                    for part in candidate.content.parts:
-                        # Check if part is text
-                        if hasattr(part, "text") and part.text:
-                            final_text.append(part.text)
-                            
-                        # Check if part is a function call
-                        if hasattr(part, "function_call"):
-                            function_call = part.function_call
-
-                            if function_call:
-                                has_function_call = True
-                                tool_name = function_call.name
-                                
-                                try:
-                                    if hasattr(function_call.args, "items"):
-                                        tool_args = {}
-                                        for k, v in function_call.args.items():
-                                            tool_args[k] = v
-                                    else:
-                                        # Fallback if it's a string (which is rare but possible)
-                                        tool_args = json.loads(str(function_call.args))
-                                        
-                                    logger.debug(f"Parsed tool args: {tool_args}")
-                                except Exception as e:
-                                    logger.error(f"Failed to parse function args: {e} - {type(function_call.args)}")
-                                    tool_args = {}
-                                    
-                                # Show what function was called
-                                function_call_text = f"I need to call the {tool_name} function to help with your request."
-                                final_text.append(function_call_text)
-                                
-                                # Execute tool call
-                                logger.debug(f"Calling tool {tool_name} with args {tool_args}...")
-                                final_text.append(f"[Calling tool {tool_name} with args {tool_args}]")
-                                result = await self.session.call_tool(tool_name, tool_args)
-                                final_text.append(f"[tool results: {result}]")
-                                
-                                # Create a function response part
-                                function_response_part = genai_types.Part.from_function_response(
-                                    name=tool_name,
-                                    response={"result": result},
-                                )
-
-                                # Append function call and result of the function execution response to contents
-                                contents = [
-                                    genai_types.Content(role="model", parts=[genai_types.Part(function_call=function_call)]) 
-                                ]
-                                # Add to messages history                               
-                                messages.append({
-                                                "role": "assistant", 
-                                                "content": function_call.model_dump_json()
-                                    })
-
-                                contents.append(
-                                    genai_types.Content(role="user", parts=[function_response_part])
-                                )
-                                # Add to messages history                               
-                                messages.append({
-                                                "role": "user", 
-                                                "content": {"result": result}
-                                            })
-                               
-                                # Send function response to get final answer
-                                try:
-                                    follow_up_response = model_instance.models.generate_content(
-                                        model=model,
-                                        config=config,
-                                        contents=contents,
-                                    )
-                                    
-                                    # Get text from follow-up response parts
-                                    if hasattr(follow_up_response, "candidates") and len(follow_up_response.candidates) > 0:
-                                        follow_up_candidate = follow_up_response.candidates[0]
-                                        if hasattr(follow_up_candidate, "content") and hasattr(follow_up_candidate.content, "parts"):
-                                            follow_up_text = ""
-                                            for follow_up_part in follow_up_candidate.content.parts:
-                                                if hasattr(follow_up_part, "text"):
-                                                    follow_up_text += follow_up_part.text
-                                                    
-                                            final_text.append(follow_up_text)
-                                            messages.append({
-                                                "role": "assistant", 
-                                                "content": follow_up_text
-                                            })
-                                    
-                                except Exception as e:
-                                    logger.error(f"Error in follow-up response: {str(e)}")
-                                    final_text.append("Error processing function result.")
-
+            # Process the response
+            final_text, messages = await self._process_gemini_response(
+                response, 
+                final_text, 
+                messages, 
+                model, 
+                config
+            )
+                
         except Exception as e:
-            logger.error(f"Error in Gemini processing: {str(e)}")
-            raise
+            logger.error(f"Error in Gemini processing: {str(e)}", exc_info=True)
+            final_text.append(f"I encountered an error while processing your request: {str(e)}")
             
         return "\n".join(final_text), messages
     
+    def _convert_tools_to_gemini_format(self, available_tools: list) -> list:
+        """Convert tools from MCP format to Gemini format."""
+        
+        # Map JSON schema types to Gemini types
+        type_mapping = {
+            "number": "NUMBER",
+            "integer": "INTEGER",
+            "boolean": "BOOLEAN",
+            "array": "ARRAY",
+            "object": "OBJECT",
+        }
+
+        gemini_tools = []
+        for tool in available_tools:
+            # Create basic tool structure
+            function_declaration = {
+                "name": tool["name"],
+                "description": tool["description"],
+                "parameters": {"type": "OBJECT", "properties": {}, "required": []}
+            }
+            
+            # Convert schema if available
+            if "input_schema" in tool and tool["input_schema"]:
+                schema = tool["input_schema"]
+                
+                # Add properties from the schema
+                if "properties" in schema:
+                    for prop_name, prop_details in schema["properties"].items():
+                        prop_type = prop_details.get("type", "STRING").upper()
+                        prop_type = type_mapping.get(prop_type.lower(), "STRING")
+                            
+                        property_schema = {"type": prop_type}
+                        if "description" in prop_details:
+                            property_schema["description"] = prop_details["description"]
+                            
+                        function_declaration["parameters"]["properties"][prop_name] = property_schema
+                        
+                # Add required properties
+                if "required" in schema:
+                    function_declaration["parameters"]["required"] = schema["required"]
+                    
+            gemini_tools.append(function_declaration)
+        return gemini_tools
+    
+    def _prepare_gemini_chat_history(self, previous_messages: list) -> list:
+        """Prepare chat history in Gemini's format."""
+        chat_history = []
+        if not previous_messages:
+            return chat_history
+            
+        for message in previous_messages:
+            if message["role"] == "user" and isinstance(message["content"], str):
+                chat_history.append({
+                    "role": "user",
+                    "parts": [{"text": message["content"]}]
+                })
+            elif message["role"] == "assistant" and isinstance(message["content"], str):
+                chat_history.append({
+                    "role": "model",
+                    "parts": [{"text": message["content"]}]
+                })
+        return chat_history
+    
+    async def _process_gemini_response(self, response, final_text, messages, model, config):
+        """Process the response from Gemini, including any function calls."""
+        if not hasattr(response, "candidates") or not response.candidates:
+            logger.warning("No candidates in Gemini response")
+            final_text.append("I couldn't generate a proper response.")
+            return final_text, messages
+            
+        candidate = response.candidates[0]
+        if not hasattr(candidate, "content") or not hasattr(candidate.content, "parts"):
+            logger.warning("No content or parts in Gemini response")
+            final_text.append("I received an incomplete response.")
+            return final_text, messages
+            
+        # Process text and function calls
+        for part in candidate.content.parts:
+            # Process text part
+            if hasattr(part, "text") and part.text:
+                final_text.append(part.text)
+                
+            # Process function call part
+            if hasattr(part, "function_call") and part.function_call:
+                function_call = part.function_call
+                tool_name = function_call.name
+                
+                # Parse tool arguments
+                tool_args = self._parse_gemini_function_args(function_call)
+                    
+                # Add function call info to response
+                function_call_text = f"I need to call the {tool_name} function to help with your request."
+                final_text.append(function_call_text)
+                
+                # Execute tool call
+                try:
+                    logger.debug(f"Calling tool {tool_name} with args {tool_args}...")
+                    final_text.append(f"[Calling tool {tool_name} with args {tool_args}]")
+                    result = await self.session.call_tool(tool_name, tool_args)
+                    final_text.append(f"[tool results: {result}]")
+                    
+                    # Create a function response and send to Gemini for follow-up
+                    final_text, messages = await self._handle_tool_result(
+                        tool_name, 
+                        function_call, 
+                        result, 
+                        final_text, 
+                        messages,
+                        model,
+                        config
+                    )
+                except Exception as e:
+                    error_msg = f"Error executing tool {tool_name}: {str(e)}"
+                    logger.error(error_msg, exc_info=True)
+                    final_text.append(error_msg)
+                
+        return final_text, messages
+    
+    def _parse_gemini_function_args(self, function_call):
+        """Parse function arguments from Gemini function call."""
+        tool_args = {}
+        try:
+            if hasattr(function_call.args, "items"):
+                for k, v in function_call.args.items():
+                    tool_args[k] = v
+            else:
+                # Fallback if it's a string
+                args_str = str(function_call.args)
+                if args_str.strip():
+                    tool_args = json.loads(args_str)
+                    
+            logger.debug(f"Parsed tool args: {tool_args}")
+        except Exception as e:
+            logger.error(f"Failed to parse function args: {e} - {type(function_call.args)}", exc_info=True)
+            
+        return tool_args
+    
+    async def _handle_tool_result(self, tool_name, function_call, result, final_text, messages, model, config):
+        """Handle the result of a tool call and get follow-up response."""
+        try:
+            # Prepare function response
+            function_response_part = genai_types.Part.from_function_response(
+                name=tool_name,
+                response={"result": result.content if hasattr(result, "content") else str(result)},
+            )
+
+            # Prepare contents for follow-up
+            contents = [
+                genai_types.Content(
+                    role="model", 
+                    parts=[genai_types.Part(function_call=function_call)]
+                )
+            ]
+            
+            # Add to messages history                               
+            messages.append({
+                "role": "assistant", 
+                "content": function_call.model_dump_json()
+            })
+
+            # Add function response to contents
+            contents.append(
+                genai_types.Content(
+                    role="user", 
+                    parts=[function_response_part]
+                )
+            )
+            
+            # Add to messages history
+            result_content = result.content if hasattr(result, "content") else str(result)                           
+            messages.append({
+                "role": "user", 
+                "content": {"result": result_content}
+            })
+           
+            # Send function response to get final answer
+            follow_up_response = self.gemini.models.generate_content(
+                model=model,
+                config=config,
+                contents=contents,
+            )
+            
+            # Extract text from follow-up response
+            if hasattr(follow_up_response, "candidates") and follow_up_response.candidates:
+                follow_up_candidate = follow_up_response.candidates[0]
+                if (hasattr(follow_up_candidate, "content") and 
+                    hasattr(follow_up_candidate.content, "parts")):
+                    
+                    follow_up_text = ""
+                    for follow_up_part in follow_up_candidate.content.parts:
+                        if hasattr(follow_up_part, "text"):
+                            follow_up_text += follow_up_part.text
+                            
+                    if follow_up_text:
+                        final_text.append(follow_up_text)
+                        messages.append({
+                            "role": "assistant", 
+                            "content": follow_up_text
+                        })
+                    else:
+                        final_text.append("I received the tool results but couldn't generate a follow-up response.")
+                        
+            else:
+                final_text.append("I processed your request but couldn't generate a follow-up response.")
+                
+        except Exception as e:
+            logger.error(f"Error in follow-up response: {str(e)}", exc_info=True)
+            final_text.append(f"I received the tool results but encountered an error: {str(e)}")
+            
+        return final_text, messages
+
     async def chat_loop(self):
         """Run an interactive chat loop with the server."""
         previous_messages = []
